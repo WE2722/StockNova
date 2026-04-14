@@ -1,0 +1,91 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Prediction Dashboard | StockNova AI{% endblock %}
+
+{% block content %}
+<section class="hero-panel mb-4">
+    <div>
+        <p class="hero-kicker mb-1">AI FORECAST CENTER</p>
+        <h1 class="hero-title mb-2">Live Stockout Prediction Dashboard</h1>
+        <p class="hero-subtitle mb-0">Predictive analytics focused on products most likely to run out soon.</p>
+    </div>
+</section>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3"><div class="metric-card danger"><h6>High Risk</h6><h2>{{ high_risk }}</h2></div></div>
+    <div class="col-md-6 col-xl-3"><div class="metric-card warning"><h6>Medium Risk</h6><h2>{{ medium_risk }}</h2></div></div>
+    <div class="col-md-6 col-xl-3"><div class="metric-card"><h6>Low Risk</h6><h2>{{ low_risk }}</h2></div></div>
+    <div class="col-md-6 col-xl-3"><div class="metric-card info"><h6>Stockout in <= 7d</h6><h2>{{ soon_7d }}</h2></div></div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-lg-5">
+        <div class="panel-card">
+            <h5 class="mb-3">Risk Distribution</h5>
+            <canvas id="riskChart" height="190"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="panel-card">
+            <h5 class="mb-3">Top Urgent SKUs (days to stockout)</h5>
+            <canvas id="urgentChart" height="190"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="panel-card"
+     id="live-prediction-dashboard"
+     hx-get="{% url 'inventory:prediction_dashboard_live' %}"
+     hx-trigger="load, every 15s"
+     hx-target="#live-prediction-dashboard"
+     hx-swap="innerHTML">
+    {% include 'inventory/partials/prediction_table.html' %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const riskLabels = {{ risk_labels|safe }};
+const riskData = {{ risk_data|safe }};
+const urgentLabels = {{ urgent_labels|safe }};
+const urgentDays = {{ urgent_days|safe }};
+
+const riskChartEl = document.getElementById('riskChart');
+if (riskChartEl) {
+  new Chart(riskChartEl, {
+    type: 'doughnut',
+    data: {
+      labels: riskLabels,
+      datasets: [{
+        data: riskData,
+        backgroundColor: ['#dc3545', '#ffc107', '#12b8a6'],
+        borderWidth: 0,
+      }],
+    },
+    options: { plugins: { legend: { position: 'bottom' } } },
+  });
+}
+
+const urgentChartEl = document.getElementById('urgentChart');
+if (urgentChartEl) {
+  new Chart(urgentChartEl, {
+    type: 'bar',
+    data: {
+      labels: urgentLabels,
+      datasets: [{
+        label: 'Days to stockout',
+        data: urgentDays,
+        backgroundColor: '#0f5cc0',
+        borderRadius: 8,
+      }],
+    },
+    options: {
+      scales: {
+        y: { beginAtZero: true, title: { display: true, text: 'Days' } },
+      },
+      plugins: { legend: { display: false } },
+    },
+  });
+}
+</script>
+{% endblock %}

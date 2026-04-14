@@ -1,12 +1,18 @@
 :root {
-  --sn-primary: #086375;
-  --sn-surface: #f7f9fb;
-  --sn-sidebar: linear-gradient(165deg, #042a2b, #0b4f6c);
+  --sn-primary: #0f5cc0;
+  --sn-accent: #12b8a6;
+  --sn-surface: #f6f8fc;
+  --sn-ink: #0d1b2a;
+  --sn-sidebar: linear-gradient(170deg, #09142a, #0f2f5c 46%, #13667f);
 }
 
 body {
   font-family: "IBM Plex Sans", sans-serif;
-  background: radial-gradient(circle at top right, #e5f4f8, #f8fafc 42%);
+  color: var(--sn-ink);
+  background:
+    radial-gradient(circle at 10% 0%, #dfe9ff 0%, rgba(223, 233, 255, 0) 36%),
+    radial-gradient(circle at 100% 10%, #d8fff7 0%, rgba(216, 255, 247, 0) 28%),
+    #f5f8fc;
 }
 
 h1, h2, h3, h4, h5, .brand {
@@ -17,6 +23,21 @@ h1, h2, h3, h4, h5, .brand {
   width: 270px;
   background: var(--sn-sidebar);
   color: #fff;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.brand-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #4ad8ff, #3bffd6);
+  box-shadow: 0 0 20px rgba(74, 216, 255, 0.8);
 }
 
 .brand {
@@ -26,22 +47,58 @@ h1, h2, h3, h4, h5, .brand {
 
 .sidebar .nav-link {
   color: rgba(255, 255, 255, 0.8);
-  border-radius: 12px;
+  border-radius: 999px;
+  padding: 0.55rem 0.95rem;
+  font-weight: 500;
 }
 
 .sidebar .nav-link.active,
 .sidebar .nav-link:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.2);
   color: #fff;
+}
+
+.app-main {
+  position: relative;
+}
+
+.topbar {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(17, 65, 129, 0.08);
+  border-radius: 16px;
+  padding: 0.8rem 1rem;
+  backdrop-filter: blur(7px);
+}
+
+.hero-panel {
+  border-radius: 20px;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid rgba(17, 65, 129, 0.12);
+  background: linear-gradient(120deg, #ffffff, #eff7ff 55%, #ecfff9);
+}
+
+.hero-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-size: 0.72rem;
+  color: #4a637d;
+}
+
+.hero-title {
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+}
+
+.hero-subtitle {
+  color: #4f6276;
 }
 
 .panel-card,
 .metric-card {
-  background: #fff;
+  background: linear-gradient(170deg, #fff, #fbfdff);
   border-radius: 18px;
   padding: 1rem 1.1rem;
-  border: 1px solid #e7edf2;
-  box-shadow: 0 8px 30px rgba(7, 48, 64, 0.05);
+  border: 1px solid #e1e9f4;
+  box-shadow: 0 10px 30px rgba(15, 48, 89, 0.07);
   animation: fadeUp 0.4s ease;
 }
 
@@ -60,9 +117,43 @@ h1, h2, h3, h4, h5, .brand {
   border-left: 4px solid #dc3545;
 }
 
+.metric-card.info {
+  border-left: 4px solid var(--sn-primary);
+}
+
 .auth-page {
   min-height: 100vh;
   background: linear-gradient(130deg, #052e3b, #126782);
+}
+
+.landing-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 5% 15%, #dbf2ff 0%, rgba(219, 242, 255, 0) 33%),
+    radial-gradient(circle at 100% 0%, #dffcf0 0%, rgba(223, 252, 240, 0) 35%),
+    #f8fbff;
+}
+
+.landing-hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.landing-panel-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-panel-glow::after {
+  content: "";
+  position: absolute;
+  inset: auto -50px -80px auto;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(18, 184, 166, 0.28), rgba(18, 184, 166, 0));
+  pointer-events: none;
 }
 
 .auth-card {
@@ -75,6 +166,13 @@ h1, h2, h3, h4, h5, .brand {
 [data-theme='dark'] main {
   background: #101419;
   color: #d8e0e8;
+}
+
+.table thead th {
+  color: #4f6073;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 @keyframes fadeUp {

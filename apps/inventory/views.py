@@ -9,9 +9,11 @@ from django.db.models import Count, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from openpyxl import Workbook
 
 from services.audit import log_action
+from services.predictions import top_risk_predictions
 
 from .forms import CategoryForm, ProductForm, StockAdjustForm
 from .models import AuditLog, Category, Product, StockMovement
@@ -65,17 +67,71 @@ def dashboard(request):
         .values("name", "product_count")
         .order_by("name")
     )
+    prediction_rows = top_risk_predictions(limit=8, horizon_days=21, include_low_risk=False)
+    predicted_stockout_7d = sum(
+        1
+        for item in prediction_rows
+        if item["days_to_stockout"] is not None and item["days_to_stockout"] <= 7
+    )
 
     context = {
         "total_products": total_products,
         "categories_count": categories_count,
         "low_stock": low_stock,
         "out_of_stock": out_of_stock,
+        "predicted_stockout_7d": predicted_stockout_7d,
+        "prediction_rows": prediction_rows,
+        "prediction_generated_at": timezone.localtime(),
         "chart_labels": json.dumps([c["name"] for c in category_breakdown]),
         "chart_data": json.dumps([c["product_count"] for c in category_breakdown]),
         "recent_movements": StockMovement.objects.select_related("product", "performed_by")[:8],
     }
     return render(request, "inventory/dashboard.html", context)
+
+
+@login_required
+@permission_required("inventory.view_product", raise_exception=True)
+def live_predictions_widget(request):
+    context = {
+        "prediction_rows": top_risk_predictions(limit=12, horizon_days=30, include_low_risk=False),
+        "prediction_generated_at": timezone.localtime(),
+    }
+    return render(request, "inventory/partials/prediction_table.html", context)
+
+
+@login_required
+def prediction_dashboard(request):
+    predictions = top_risk_predictions(limit=50, horizon_days=30, include_low_risk=True)
+
+    high = sum(1 for p in predictions if p["risk_level"] == "high")
+    medium = sum(1 for p in predictions if p["risk_level"] == "medium")
+    low = sum(1 for p in predictions if p["risk_level"] == "low")
+    soon_7d = sum(1 for p in predictions if p["days_to_stockout"] is not None and p["days_to_stockout"] <= 7)
+
+    top_urgent = sorted(predictions, key=lambda p: -p.get("urgency_score", 0))[:10]
+
+    context = {
+        "high_risk": high,
+        "medium_risk": medium,
+        "low_risk": low,
+        "soon_7d": soon_7d,
+        "risk_labels": json.dumps(["High", "Medium", "Low"]),
+        "risk_data": json.dumps([high, medium, low]),
+        "urgent_labels": json.dumps([p["sku"] for p in top_urgent]),
+        "urgent_days": json.dumps([p["days_to_stockout"] if p["days_to_stockout"] is not None else 999 for p in top_urgent]),
+        "prediction_rows": top_risk_predictions(limit=20, horizon_days=30, include_low_risk=False),
+        "prediction_generated_at": timezone.localtime(),
+    }
+    return render(request, "inventory/prediction_dashboard.html", context)
+
+
+@login_required
+def prediction_dashboard_live(request):
+    context = {
+        "prediction_rows": top_risk_predictions(limit=20, horizon_days=30, include_low_risk=False),
+        "prediction_generated_at": timezone.localtime(),
+    }
+    return render(request, "inventory/partials/prediction_table.html", context)
 
 
 @login_required

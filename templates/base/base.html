@@ -16,31 +16,36 @@
 <body class="app-shell" x-data="{dark: false}" :data-theme="dark ? 'dark' : 'light'">
 <div class="d-flex min-vh-100">
     {% if user.is_authenticated %}
-    <aside class="sidebar p-3 d-flex flex-column">
-        <h1 class="brand mb-4">StockNova AI</h1>
+    <aside class="sidebar p-3 p-lg-4 d-flex flex-column">
+        <div class="brand-wrap mb-4">
+            <span class="brand-dot"></span>
+            <h1 class="brand mb-0">StockNova AI</h1>
+        </div>
         <nav class="nav flex-column gap-2">
             <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'inventory:dashboard' %}">Dashboard</a>
             <a class="nav-link {% if 'product' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'inventory:product_list' %}">Products</a>
             <a class="nav-link {% if 'category' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'inventory:category_list' %}">Categories</a>
             <a class="nav-link {% if request.resolver_match.url_name == 'audit_log_list' %}active{% endif %}" href="{% url 'inventory:audit_log_list' %}">Audit Logs</a>
+            <a class="nav-link {% if request.resolver_match.url_name == 'prediction_dashboard' %}active{% endif %}" href="{% url 'inventory:prediction_dashboard' %}">Predictions</a>
         </nav>
         <div class="mt-auto pt-4">
-            <button class="btn btn-outline-light w-100 mb-2" @click="dark = !dark">Toggle theme</button>
+            <button class="btn btn-outline-light w-100 mb-2 rounded-pill" @click="dark = !dark">Toggle theme</button>
             <form method="post" action="{% url 'accounts:logout' %}">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-danger w-100">Logout</button>
+                <button type="submit" class="btn btn-danger w-100 rounded-pill">Logout</button>
             </form>
         </div>
     </aside>
     {% endif %}
 
-    <main class="flex-grow-1 p-3 p-md-4">
+    <main class="flex-grow-1 p-3 p-lg-4 app-main">
         {% if user.is_authenticated %}
-        <header class="d-flex justify-content-between align-items-center mb-4">
+        <header class="d-flex justify-content-between align-items-center mb-4 topbar">
             <div>
                 <p class="text-secondary mb-0">Welcome back</p>
                 <h2 class="fw-bold mb-0">{{ user.get_full_name|default:user.username }}</h2>
             </div>
+            <span class="badge rounded-pill text-bg-light border px-3 py-2">SaaS Pro Mode</span>
         </header>
         {% endif %}
 

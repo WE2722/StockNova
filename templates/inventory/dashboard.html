@@ -3,6 +3,14 @@
 {% block title %}Dashboard | StockNova AI{% endblock %}
 
 {% block content %}
+<section class="hero-panel mb-4">
+    <div>
+        <p class="hero-kicker mb-1">StockNova Intelligence</p>
+        <h1 class="hero-title mb-2">Inventory Command Center</h1>
+        <p class="hero-subtitle mb-0">Real-time stock visibility, automated risk detection, and AI-driven reorder guidance.</p>
+    </div>
+</section>
+
 <div class="row g-3 mb-4">
     <div class="col-md-6 col-xl-3">
         <div class="metric-card">
@@ -28,16 +36,38 @@
             <h2>{{ out_of_stock }}</h2>
         </div>
     </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="metric-card info">
+            <h6>Predicted Stockouts (7d)</h6>
+            <h2>{{ predicted_stockout_7d }}</h2>
+        </div>
+    </div>
 </div>
 
 <div class="row g-3">
-    <div class="col-lg-7">
+    <div class="col-lg-6">
         <div class="panel-card">
             <h5 class="mb-3">Products by Category</h5>
             <canvas id="categoryChart" height="130"></canvas>
         </div>
     </div>
-    <div class="col-lg-5">
+    <div class="col-lg-6">
+        <div class="panel-card">
+            <div
+                id="live-prediction-widget"
+                hx-get="{% url 'inventory:live_predictions_widget' %}"
+                hx-trigger="load, every 20s"
+                hx-target="#live-prediction-widget"
+                hx-swap="innerHTML"
+            >
+                {% include 'inventory/partials/prediction_table.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mt-1">
+    <div class="col-12">
         <div class="panel-card">
             <h5 class="mb-3">Recent Stock Activity</h5>
             <div class="table-responsive">
@@ -47,6 +77,7 @@
                             <th>Product</th>
                             <th>Type</th>
                             <th>Qty</th>
+                            <th>By</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -55,9 +86,10 @@
                             <td>{{ movement.product.name }}</td>
                             <td>{{ movement.get_movement_type_display }}</td>
                             <td>{{ movement.quantity }}</td>
+                            <td>{{ movement.performed_by|default:'system' }}</td>
                         </tr>
                         {% empty %}
-                        <tr><td colspan="3" class="text-secondary">No stock operations yet.</td></tr>
+                        <tr><td colspan="4" class="text-secondary">No stock operations yet.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>

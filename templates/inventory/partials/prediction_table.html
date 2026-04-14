@@ -1,0 +1,30 @@
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h5 class="mb-0">AI At-Risk Forecast</h5>
+    <small class="text-secondary">Updated {{ prediction_generated_at|date:'H:i:s' }}</small>
+</div>
+<div class="table-responsive mb-2">
+    <table class="table table-sm align-middle">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Days left</th>
+                <th>Risk</th>
+                <th>Reorder</th>
+                <th>Confidence</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in prediction_rows %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.days_to_stockout|default:'N/A' }}</td>
+                <td><span class="badge text-bg-{% if item.risk_level == 'high' %}danger{% elif item.risk_level == 'medium' %}warning{% else %}success{% endif %}">{{ item.risk_level|title }}</span></td>
+                <td>{{ item.recommended_reorder }}</td>
+                <td>{{ item.confidence }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-secondary">No predictions available yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
