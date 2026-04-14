@@ -1,0 +1,63 @@
+name: StockNova CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+
+jobs:
+  test-and-security:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: stocknova_db
+          POSTGRES_USER: stocknova_user
+          POSTGRES_PASSWORD: stocknova_pass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U stocknova_user -d stocknova_db"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.ci
+      DJANGO_SECRET_KEY: ci-secret-key
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+      POSTGRES_DB: stocknova_db
+      POSTGRES_USER: stocknova_user
+      POSTGRES_PASSWORD: stocknova_pass
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: 5432
+      CELERY_TASK_ALWAYS_EAGER: 1
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Security scan (Bandit)
+        run: bandit -r apps services config -x */migrations/*
+
+      - name: Dependency vulnerability scan
+        run: pip-audit -r requirements.txt
+
+      - name: Django checks and tests
+        run: |
+          python manage.py migrate --noinput
+          python manage.py test

@@ -1,0 +1,89 @@
+:root {
+  --sn-primary: #086375;
+  --sn-surface: #f7f9fb;
+  --sn-sidebar: linear-gradient(165deg, #042a2b, #0b4f6c);
+}
+
+body {
+  font-family: "IBM Plex Sans", sans-serif;
+  background: radial-gradient(circle at top right, #e5f4f8, #f8fafc 42%);
+}
+
+h1, h2, h3, h4, h5, .brand {
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.sidebar {
+  width: 270px;
+  background: var(--sn-sidebar);
+  color: #fff;
+}
+
+.brand {
+  font-size: 1.5rem;
+  letter-spacing: 0.03em;
+}
+
+.sidebar .nav-link {
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+}
+
+.sidebar .nav-link.active,
+.sidebar .nav-link:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.panel-card,
+.metric-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 1rem 1.1rem;
+  border: 1px solid #e7edf2;
+  box-shadow: 0 8px 30px rgba(7, 48, 64, 0.05);
+  animation: fadeUp 0.4s ease;
+}
+
+.metric-card h6 {
+  color: #5f6b74;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
+.metric-card.warning {
+  border-left: 4px solid #ffc107;
+}
+
+.metric-card.danger {
+  border-left: 4px solid #dc3545;
+}
+
+.auth-page {
+  min-height: 100vh;
+  background: linear-gradient(130deg, #052e3b, #126782);
+}
+
+.auth-card {
+  width: min(440px, 92vw);
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] main {
+  background: #101419;
+  color: #d8e0e8;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 992px) {
+  .sidebar { width: 84px; }
+  .sidebar .brand { font-size: 1rem; }
+  .sidebar .nav-link { font-size: 0; }
+}

@@ -1,0 +1,41 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Categories | StockNova AI{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">Categories</h3>
+    {% if perms.inventory.add_category %}
+    <a href="{% url 'inventory:category_create' %}" class="btn btn-primary">New Category</a>
+    {% endif %}
+</div>
+
+<div class="panel-card">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr><th>Name</th><th>Products</th><th>Description</th><th class="text-end">Actions</th></tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                    <td>{{ category.name }}</td>
+                    <td>{{ category.product_count }}</td>
+                    <td>{{ category.description|default:'-' }}</td>
+                    <td class="text-end d-flex justify-content-end gap-1">
+                        {% if perms.inventory.change_category %}
+                        <a href="{% url 'inventory:category_update' category.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        {% endif %}
+                        {% if perms.inventory.delete_category %}
+                        <a href="{% url 'inventory:category_delete' category.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-secondary">No categories found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Dashboard | StockNova AI{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="metric-card">
+            <h6>Total Products</h6>
+            <h2>{{ total_products }}</h2>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="metric-card">
+            <h6>Total Categories</h6>
+            <h2>{{ categories_count }}</h2>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="metric-card warning">
+            <h6>Low Stock</h6>
+            <h2>{{ low_stock }}</h2>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="metric-card danger">
+            <h6>Out Of Stock</h6>
+            <h2>{{ out_of_stock }}</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="panel-card">
+            <h5 class="mb-3">Products by Category</h5>
+            <canvas id="categoryChart" height="130"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="panel-card">
+            <h5 class="mb-3">Recent Stock Activity</h5>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Type</th>
+                            <th>Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for movement in recent_movements %}
+                        <tr>
+                            <td>{{ movement.product.name }}</td>
+                            <td>{{ movement.get_movement_type_display }}</td>
+                            <td>{{ movement.quantity }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-secondary">No stock operations yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const labels = {{ chart_labels|safe }};
+const data = {{ chart_data|safe }};
+if (document.getElementById('categoryChart')) {
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Products',
+                data,
+                borderRadius: 8,
+                backgroundColor: '#086375'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {legend: {display: false}},
+            scales: {y: {beginAtZero: true}}
+        }
+    });
+}
+</script>
+{% endblock %}

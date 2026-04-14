@@ -1,0 +1,45 @@
+{% load inventory_extras %}
+{% extends 'base/base.html' %}
+
+{% block title %}{{ product.name }} | StockNova AI{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="panel-card">
+            <h3>{{ product.name }}</h3>
+            <p class="text-secondary mb-1">SKU: {{ product.sku }}</p>
+            <p class="mb-2">{{ product.description|default:'No description provided.' }}</p>
+            <p class="mb-2"><strong>Category:</strong> {{ product.category.name }}</p>
+            <p class="mb-2"><strong>Price:</strong> ${{ product.price }}</p>
+            <p class="mb-2"><strong>Stock:</strong> {{ product.stock }}</p>
+            <p><span class="badge {{ product.stock_status|status_badge_class }}">{{ product.get_stock_status_display }}</span></p>
+
+            <div class="d-flex gap-2 mt-3">
+                {% if perms.inventory.change_product %}
+                <a class="btn btn-success" href="{% url 'inventory:adjust_stock' product.id 'increase' %}">Increase Stock</a>
+                <a class="btn btn-warning" href="{% url 'inventory:adjust_stock' product.id 'decrease' %}">Decrease Stock</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="panel-card">
+            <h5>Stock History</h5>
+            <ul class="list-group list-group-flush">
+                {% for movement in movements %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <div>
+                        <div class="fw-semibold">{{ movement.get_movement_type_display }} {{ movement.quantity }}</div>
+                        <small class="text-secondary">{{ movement.created_at|date:'Y-m-d H:i' }} by {{ movement.performed_by|default:'system' }}</small>
+                    </div>
+                    <small>{{ movement.previous_stock }} → {{ movement.new_stock }}</small>
+                </li>
+                {% empty %}
+                <li class="list-group-item text-secondary">No movements recorded.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

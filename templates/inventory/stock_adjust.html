@@ -1,0 +1,21 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Adjust Stock | StockNova AI{% endblock %}
+
+{% block content %}
+<div class="panel-card col-lg-5 mx-auto">
+    <h3 class="mb-3 text-capitalize">{{ action }} Stock</h3>
+    <p class="text-secondary">Product: <strong>{{ product.name }}</strong> (current: {{ product.stock }})</p>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-3">
+            <label class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<div class="text-danger small">{{ field.errors|striptags }}</div>{% endif %}
+        </div>
+        {% endfor %}
+        <button class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}

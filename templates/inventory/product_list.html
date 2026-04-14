@@ -1,0 +1,60 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Products | StockNova AI{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">Products</h3>
+    {% if perms.inventory.add_product %}
+    <a href="{% url 'inventory:product_create' %}" class="btn btn-primary">New Product</a>
+    {% endif %}
+</div>
+
+<div class="d-flex gap-2 mb-3">
+    <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis">Low stock alerts: {{ low_alert_count }}</span>
+    <span class="badge rounded-pill bg-danger-subtle text-danger">Out of stock: {{ out_alert_count }}</span>
+</div>
+
+<form class="panel-card mb-3" hx-get="{% url 'inventory:product_list' %}" hx-target="#product-table-wrapper" hx-trigger="keyup changed delay:350ms from:input, change from:select" hx-push-url="true">
+    <div class="row g-2">
+        <div class="col-lg-3">
+            <input class="form-control" type="text" name="q" placeholder="Search name or SKU" value="{{ request.GET.q }}">
+        </div>
+        <div class="col-lg-2">
+            <select name="category" class="form-select">
+                <option value="">All categories</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:'s' %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-lg-2">
+            <select name="stock_status" class="form-select">
+                <option value="">Any stock status</option>
+                {% for value, label in stock_choices %}
+                <option value="{{ value }}" {% if request.GET.stock_status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-lg-2"><input class="form-control" type="number" step="0.01" name="min_price" placeholder="Min price" value="{{ request.GET.min_price }}"></div>
+        <div class="col-lg-2"><input class="form-control" type="number" step="0.01" name="max_price" placeholder="Max price" value="{{ request.GET.max_price }}"></div>
+        <div class="col-lg-1">
+            <select name="sort" class="form-select">
+                <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>A-Z</option>
+                <option value="-name" {% if request.GET.sort == '-name' %}selected{% endif %}>Z-A</option>
+                <option value="price" {% if request.GET.sort == 'price' %}selected{% endif %}>Price ↑</option>
+                <option value="-price" {% if request.GET.sort == '-price' %}selected{% endif %}>Price ↓</option>
+            </select>
+        </div>
+    </div>
+</form>
+
+<div class="d-flex gap-2 mb-3">
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'inventory:export_products_csv' %}?{{ request.GET.urlencode }}">Export CSV</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'inventory:export_products_excel' %}?{{ request.GET.urlencode }}">Export Excel</a>
+</div>
+
+<div id="product-table-wrapper">
+    {% include 'inventory/partials/product_table.html' %}
+</div>
+{% endblock %}

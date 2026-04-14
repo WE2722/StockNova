@@ -1,0 +1,55 @@
+{% load inventory_extras %}
+<div class="panel-card">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>
+                        <a href="{% url 'inventory:product_detail' product.id %}" class="fw-semibold text-decoration-none text-dark">{{ product.name }}</a>
+                        <div class="small text-secondary">{{ product.sku }}</div>
+                    </td>
+                    <td>{{ product.category.name }}</td>
+                    <td>${{ product.price }}</td>
+                    <td>{{ product.stock }}</td>
+                    <td>
+                        <span class="badge rounded-pill {{ product.stock_status|status_badge_class }}">{{ product.get_stock_status_display }}</span>
+                    </td>
+                    <td class="text-end d-flex justify-content-end gap-1">
+                        {% if perms.inventory.change_product %}
+                        <a href="{% url 'inventory:product_update' product.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        {% endif %}
+                        {% if perms.inventory.delete_product %}
+                        <a href="{% url 'inventory:product_delete' product.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-secondary">No products found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if products.paginator.num_pages > 1 %}
+    <nav>
+        <ul class="pagination mt-3 mb-0">
+            {% for num in products.paginator.page_range %}
+            <li class="page-item {% if products.number == num %}active{% endif %}">
+                <a class="page-link" href="?{% for k, v in request.GET.items %}{% if k != 'page' %}{{ k }}={{ v|urlencode }}&{% endif %}{% endfor %}page={{ num }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>

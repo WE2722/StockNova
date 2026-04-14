@@ -1,0 +1,9 @@
+{% extends 'base/base.html' %}
+{% block title %}Access Denied{% endblock %}
+{% block content %}
+<div class="panel-card col-lg-6 mx-auto text-center">
+    <h2>Access denied</h2>
+    <p class="text-secondary">You do not have permission to perform this action.</p>
+    <a class="btn btn-primary" href="{% url 'inventory:dashboard' %}">Back to dashboard</a>
+</div>
+{% endblock %}
