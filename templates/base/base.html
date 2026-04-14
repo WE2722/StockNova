@@ -26,7 +26,10 @@
         </nav>
         <div class="mt-auto pt-4">
             <button class="btn btn-outline-light w-100 mb-2" @click="dark = !dark">Toggle theme</button>
-            <a href="{% url 'accounts:logout' %}" class="btn btn-danger w-100">Logout</a>
+            <form method="post" action="{% url 'accounts:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger w-100">Logout</button>
+            </form>
         </div>
     </aside>
     {% endif %}

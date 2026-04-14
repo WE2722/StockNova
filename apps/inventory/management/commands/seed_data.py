@@ -51,16 +51,16 @@ class Command(BaseCommand):
             ("viewer", "Viewer123!", "Viewer", False, False),
         ]
         for username, password, group_name, is_staff, is_superuser in users:
-            user, created = User.objects.get_or_create(
-                username=username,
-                defaults={"is_staff": is_staff, "is_superuser": is_superuser},
-            )
-            if created:
-                user.set_password(password)
-                user.email = f"{username}@stocknova.local"
-                user.save()
+            user, _ = User.objects.get_or_create(username=username)
+            # Always enforce demo credentials so login stays deterministic.
+            user.is_staff = is_staff
+            user.is_superuser = is_superuser
+            user.is_active = True
+            user.email = f"{username}@stocknova.local"
+            user.set_password(password)
+            user.save()
             group = Group.objects.get(name=group_name)
-            user.groups.add(group)
+            user.groups.set([group])
 
     def _create_categories(self, fake, count):
         categories = []
@@ -84,6 +84,10 @@ class Command(BaseCommand):
         return f"products/seed/{sku}.png"
 
     def _create_products(self, fake, categories, count):
+        if not categories and count > 0:
+            self.stdout.write(self.style.WARNING("No categories available, skipping product generation."))
+            return
+
         for idx in range(count):
             sku = f"SN-{1000 + idx}"
             Product.objects.get_or_create(
