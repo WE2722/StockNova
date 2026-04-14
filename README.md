@@ -143,9 +143,3 @@ GitHub Actions workflow at `.github/workflows/ci.yml` runs:
 - Product listing uses `select_related` for query optimization.
 - Audit and stock movement logs preserve accountability.
 - Architecture is app-based and service-oriented for scale.
-
-## Next Production Steps
-
-- Integrate object storage (S3/Azure Blob) for media.
-- Add observability stack (Sentry + structured logging).
-- Add OpenTelemetry traces and metrics dashboards.
